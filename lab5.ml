@@ -94,8 +94,12 @@ Complete the implementation of gensym. As usual, you shouldn't feel
 beholden to how the definition is introduced in the skeleton code
 below. (We'll stop mentioning this now.) *)
 
-let gensym (s : string) : string =
-  failwith "gensym not implemented" ;;
+let gensym =
+  let ctr = ref 0 in
+  fun (s : string) ->
+    let temp = !ctr in
+    ctr := !ctr + 1;
+    s ^ string_of_int temp ;;
 
 (*====================================================================
 Part 3: Appending mutable lists
@@ -123,8 +127,10 @@ list to a mutable list, with behavior like this:
       Cons (1, {contents = Cons (2, {contents = Cons (3, {contents = Nil})})})
  *)
 
-let mlist_of_list (lst : 'a list) : 'a mlist =
-  failwith "mlist_of_list not implemented" ;;
+let rec mlist_of_list (lst : 'a list) : 'a mlist =
+  match lst with
+  | [] -> Nil
+  | h :: t -> Cons (h, ref (mlist_of_list t)) ;;
 
 (* Define a function length to compute the length of an mlist. Try to
 do this without looking at the solution that is given in the lecture
@@ -136,8 +142,10 @@ slides.
     - : int = 4
  *)
 
-let length (m : 'a mlist) : int =
-  failwith "length not implemented" ;;
+let rec length (m : 'a mlist) : int =
+  match m with
+  | Nil -> 0
+  | Cons(_, b) -> 1 + length !b;;
 
 (* What is the time complexity of the length function in O() notation
 in terms of the length of its list argument? *)
@@ -208,8 +216,16 @@ Example of use:
               {contents = Cons (5, {contents = Cons (6, {contents = Nil})})})})})})
  *)
 
-let mappend _ =
-  failwith "mappend not implemented" ;;
+let rec mappend m1 m2 =
+  match m1 with
+  | Nil -> ()
+  | Cons(a, b) ->
+    (match b with
+     | {contents = Nil} -> b := Cons(a, ref m2)
+     |_ -> mappend !b m2)
+
+;;
+
 
 (* What happens when you evaluate the following expressions
 sequentially in order?
@@ -300,8 +316,10 @@ module MakeImpQueue (A : sig
           | Cons(_, _) -> ());
          Some h
       | Nil -> None
-    let to_string q =
-      failwith "to_string not implemented"
+    let rec to_string q =
+      match q with
+      | _ -> "||"
+      | _ -> (A.to_string(deq q)) ^ " -> " ^ to_string q
   end ;;
 
 (* To build an imperative queue, we apply the functor to an
