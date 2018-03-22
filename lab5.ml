@@ -317,9 +317,10 @@ module MakeImpQueue (A : sig
          Some h
       | Nil -> None
     let rec to_string q =
-      match q with
+      failwith "not implemented"
+      (* match q with
       | _ -> "||"
-      | _ -> (A.to_string(deq q)) ^ " -> " ^ to_string q
+      | _ -> (A.to_string(deq q)) ^ " -> " ^ to_string q *)
   end ;;
 
 (* To build an imperative queue, we apply the functor to an
